@@ -18,14 +18,26 @@ def compute_losses(
     factors_labels = labels[:, :3]  # First 3 columns for factors
     skills_labels = labels[:, 3:]   # Remaining columns for skills
     
+    # print("Factors labels:", factors_labels)
+    # print("Skills labels:", skills_labels)
+    
+    # print("Factors logits:", factors_logits)
+    # print("factor_labels:", factors_logits[example_indices])
+    # print("factor labels in loss", factors_labels[example_indices].argmax(dim=1))
+    
     factors_loss = F.cross_entropy(
         factors_logits[example_indices],
-        factors_labels[example_indices - 11].argmax(dim=1)  # Convert one-hot to class index
+        factors_labels[example_indices].argmax(dim=1)  # Convert one-hot to class index
     )
+    
+    # print("Skills logits:", skills_logits)
+    # print("skills_labels:", skills_labels[example_indices])
+    # print("skills labels before loss", skills_labels[example_indices].argmax(dim=1))
+    # print("skills labels in loss", skills_labels[example_indices - 11].argmax(dim=1))
     
     skills_loss = F.cross_entropy(
         skills_logits[example_indices],
-        skills_labels[example_indices - 11].argmax(dim=1)  # Convert one-hot to class index
+        skills_labels[example_indices].argmax(dim=1)  # Convert one-hot to class index
     )
     
     return factors_loss, skills_loss
@@ -85,7 +97,7 @@ def train_model(
                 val_factors_logits, val_skills_logits = model(data.x, data.edge_index)
                 val_factors_loss, val_skills_loss = compute_losses(
                     val_factors_logits, val_skills_logits,
-                    data.y,  # Using combined labels
+                    data.y,  # Using combined labels (first three cols are the CFs and the rest are the skills)
                     val_example_indices
                 )
                 val_total_loss = (
@@ -104,7 +116,7 @@ def train_model(
 
 def main():
     # Set random seed for reproducibility
-    torch.manual_seed(42)
+    # torch.manual_seed(42)
     
     # Load data
     data, _ = load_data()
@@ -139,7 +151,8 @@ def main():
     if n_train > 0:
         train_losses, val_losses = train_model(
             model, data, optimizer,
-            task_weights=(1.0, 1.0)  # Equal weights for both tasks
+            task_weights=(1.0, 1.0),  # Equal weights for both tasks,
+            epochs=200
         )
         
         # Save model

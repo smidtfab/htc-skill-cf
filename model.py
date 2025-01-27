@@ -20,57 +20,52 @@ class EnhancedTherapeuticGNN(torch.nn.Module):
         self.num_layers = num_layers
         self.dropout = dropout
         
-        # GAT layers for shared feature learning
+        # GAT layers for feature learning
         self.conv_layers = ModuleList()
         self.conv_layers.append(GATConv(in_channels, hidden_channels))
         for _ in range(num_layers - 1):
             self.conv_layers.append(GATConv(hidden_channels, hidden_channels))
         
-        # Separate task-specific layers
+        # Task-specific layers
         self.factors_classifier = Linear(hidden_channels, num_common_factors)
         self.skills_classifier = Linear(hidden_channels, num_skills)
+    
+    def forward(
+        self,
+        x: torch.Tensor,
+        edge_index: torch.Tensor = None,
+        return_logits: bool = True
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Forward pass handling both training and inference.
         
-    def forward(self, x, edge_index):
-        # Shared feature learning through GAT layers
+        Args:
+            x: Node features
+            edge_index: Optional edge indices for message passing. If None, processes each node independently.
+            return_logits: If True, returns raw logits. If False, returns probabilities.
+            
+        Returns:
+            Tuple of (factors_output, skills_output), either as logits or probabilities
+        """
+        # Process through GAT layers
         for i in range(self.num_layers):
-            x = self.conv_layers[i](x, edge_index)
+            if edge_index is None:
+                # Process features independently without message passing
+                x = F.linear(x, self.conv_layers[i].lin.weight, self.conv_layers[i].lin.bias)
+            else:
+                # Full GAT operation with message passing
+                x = self.conv_layers[i](x, edge_index)
+            
             x = F.relu(x)
             x = F.dropout(x, p=self.dropout, training=self.training)
         
-        # Task-specific predictions
-        factors_logits = self.factors_classifier(x)
-        skills_logits = self.skills_classifier(x)
+        # Get predictions
+        factors_output = self.factors_classifier(x)
+        skills_output = self.skills_classifier(x)
         
-        return factors_logits, skills_logits
-    
-    def predict_text(self, data, new_text_features: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Predict common factors and skills for new text"""
-        self.eval()
-        with torch.no_grad():
-            # Add new text features to existing graph
-            x = torch.cat([data.x, new_text_features.unsqueeze(0)], dim=0)
+        # Return logits or probabilities based on flag
+        if not return_logits:
+            factors_output = F.softmax(factors_output, dim=-1)
+            skills_output = F.softmax(skills_output, dim=-1)
             
-            # Add edges connecting new node to all skill nodes
-            num_existing_nodes = data.x.size(0)
-            new_edges = []
-            for skill_id in range(4, 11):  # skill node IDs
-                new_edges.extend([
-                    [num_existing_nodes, skill_id],
-                    [skill_id, num_existing_nodes]
-                ])
-            new_edge_index = torch.cat([
-                data.edge_index,
-                torch.tensor(new_edges, dtype=torch.long).t()
-            ], dim=1)
-            
-            print(f"Edge index:\n{new_edge_index}")
-            
-            # Get predictions
-            factors_logits, skills_logits = self.forward(x, new_edge_index)
-            
-            # Return predictions for new node only
-            return (
-                F.softmax(factors_logits[-1], dim=0),
-                # torch.sigmoid(skills_logits[-1])  # Multi-label prediction for skills
-                F.softmax(skills_logits[-1], dim=0)  # Multi-class prediction for skills
-            )
+        return factors_output, skills_output

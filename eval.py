@@ -23,7 +23,7 @@ def evaluate_model(model: EnhancedTherapeuticGNN, data) -> Dict[str, Any]:
             test_indices = test_indices.unsqueeze(0)
             
         # Get test predictions and labels
-        test_labels = data.y[test_indices - 11]  # Adjust for example node indices
+        test_labels = data.y[test_indices]  # Adjust for example node indices
         factor_labels = test_labels[:, :3]  # First 3 columns for factors
         skill_labels = test_labels[:, 3:]   # Remaining columns for skills
         
@@ -98,38 +98,50 @@ def evaluate_model(model: EnhancedTherapeuticGNN, data) -> Dict[str, Any]:
             'num_test_examples': len(test_indices)
         }
 
+# eval.py
 def predict_new_text(
     model: EnhancedTherapeuticGNN,
-    data,
     dataset,
     text: str
 ) -> Tuple[Dict[str, float], Dict[str, float]]:
     """
     Predict common factors and skills for new therapeutic text example
     """
-    # Encode new text
-    text_features = dataset.encode_new_text(text)
-    
-    # Get prediction probabilities
-    factor_probs, skill_probs = model.predict_text(data, text_features)
-    
-    # Create probability dictionaries
-    factor_names = ['Bond', 'Goal Alignment', 'Task Agreement']
-    skill_names = [
-        'Reflective Listening', 'Genuineness', 'Validation', 
-        'Affirmation', 'Respect for Autonomy', 'Asking for Permission', 
-        'Open-ended Question'
-    ]
-    
-    factor_predictions = {
-        name: prob.item() for name, prob in zip(factor_names, factor_probs)
-    }
-    
-    skill_predictions = {
-        name: prob.item() for name, prob in zip(skill_names, skill_probs)
-    }
-    
-    return factor_predictions, skill_predictions
+    model.eval()
+    with torch.no_grad():
+        # Encode new text and ensure it's 2D (batch dimension)
+        text_features = dataset.encode_new_text(text)
+        if text_features.dim() == 1:
+            text_features = text_features.unsqueeze(0)
+        
+        # Get predictions using the unified forward pass
+        factor_probs, skill_probs = model(
+            text_features,
+            edge_index=None,  # Process independently
+            return_logits=False  # Get probabilities directly
+        )
+        
+        # Create probability dictionaries
+        factor_names = ['Bond', 'Goal Alignment', 'Task Agreement']
+        skill_names = [
+            'Reflective Listening', 'Genuineness', 'Validation', 
+            'Affirmation', 'Respect for Autonomy', 'Asking for Permission', 
+            'Open-ended Question'
+        ]
+        
+        # Ensure we're working with the first (and only) prediction
+        factor_probs = factor_probs.squeeze(0)
+        skill_probs = skill_probs.squeeze(0)
+        
+        factor_predictions = {
+            name: prob.item() for name, prob in zip(factor_names, factor_probs)
+        }
+        
+        skill_predictions = {
+            name: prob.item() for name, prob in zip(skill_names, skill_probs)
+        }
+        
+        return factor_predictions, skill_predictions
 
 def main():
     # Load data and model
@@ -199,7 +211,7 @@ def main():
         ]
         
         for text in example_texts:
-            factor_preds, skill_preds = predict_new_text(model, data, dataset, text)
+            factor_preds, skill_preds = predict_new_text(model, dataset, text)
             print(f"\nText: {text}")
             print("\nPredicted Common Factors:")
             for factor, prob in factor_preds.items():
