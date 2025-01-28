@@ -14,16 +14,22 @@ def compute_losses(
     example_indices: torch.Tensor
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     """Compute losses for both tasks"""
-    # Assuming labels are combined: first 3 columns for factors (one-hot), next 7 for skills (multi-label)
+    print(f"Labels shape: {labels.shape}")
+    print(f"Factors logits shape: {factors_logits.shape}")
+    print(f"Skills logits shape: {skills_logits.shape}")
+    print(f"Example indices shape: {example_indices.shape}")
+    print(f"labels:\n{labels}")
+    # Assuming labels are combined: first 3 columns for factors (one-hot), next two are the intervention concepts, and next 7 for skills (multi-label)
     factors_labels = labels[:, :3]  # First 3 columns for factors
-    skills_labels = labels[:, 3:]   # Remaining columns for skills
+    ic_labels = labels[:, 3:5]     # Next 8 columns for ICs
+    skills_labels = labels[:, 5:]   # Remaining columns for skills
     
     # print("Factors labels:", factors_labels)
     # print("Skills labels:", skills_labels)
     
     # print("Factors logits:", factors_logits)
-    # print("factor_labels:", factors_logits[example_indices])
-    # print("factor labels in loss", factors_labels[example_indices].argmax(dim=1))
+    print("factor preds:", factors_logits[example_indices])
+    print("factor labels in loss", factors_labels[example_indices].argmax(dim=1))
     
     factors_loss = F.cross_entropy(
         factors_logits[example_indices],
@@ -34,7 +40,10 @@ def compute_losses(
     # print("skills_labels:", skills_labels[example_indices])
     # print("skills labels before loss", skills_labels[example_indices].argmax(dim=1))
     # print("skills labels in loss", skills_labels[example_indices - 11].argmax(dim=1))
-    
+    print(f"Skill preds\n{skills_labels[example_indices]}")
+    print(f"Skill labels\n{skills_labels[example_indices].argmax(dim=1)}")
+    print(f"Skills logits shape: {skills_logits[example_indices].shape}")
+    print(f"Skills labels shape: {skills_labels[example_indices].argmax(dim=1).shape}")
     skills_loss = F.cross_entropy(
         skills_logits[example_indices],
         skills_labels[example_indices].argmax(dim=1)  # Convert one-hot to class index
@@ -118,8 +127,11 @@ def main():
     # Set random seed for reproducibility
     # torch.manual_seed(42)
     
+    # Settings for now
+    FILEPATH = 'data/htc_examples_ids.csv'
+    
     # Load data
-    data, _ = load_data()
+    data, _ = load_data(FILEPATH)
     
     # Print dataset statistics
     n_train = data.train_mask.sum().item()
@@ -139,6 +151,7 @@ def main():
         in_channels=data.x.size(1),
         hidden_channels=64,
         num_common_factors=3,
+        num_intervention_concepts=2,
         num_skills=7,
         num_layers=2,
         dropout=0.5

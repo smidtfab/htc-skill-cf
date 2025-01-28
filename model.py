@@ -11,6 +11,7 @@ class EnhancedTherapeuticGNN(torch.nn.Module):
         in_channels: int,
         hidden_channels: int,
         num_common_factors: int = 3,
+        num_intervention_concepts: int = 2,
         num_skills: int = 7,
         num_layers: int = 2,
         dropout: float = 0.5
