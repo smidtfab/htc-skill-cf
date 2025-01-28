@@ -13,7 +13,7 @@ def evaluate_model(model: EnhancedTherapeuticGNN, data) -> Dict[str, Any]:
     
     with torch.no_grad():
         # Get predictions
-        factors_logits, skills_logits = model(data.x, data.edge_index)
+        factors_logits, intervention_concepts_logits, skills_logits = model(data.x, data.edge_index)
         
         # Get predictions for test examples only
         test_indices = data.test_mask.nonzero().squeeze()
@@ -25,12 +25,18 @@ def evaluate_model(model: EnhancedTherapeuticGNN, data) -> Dict[str, Any]:
         # Get test predictions and labels
         test_labels = data.y[test_indices]  # Adjust for example node indices
         factor_labels = test_labels[:, :3]  # First 3 columns for factors
-        skill_labels = test_labels[:, 3:]   # Remaining columns for skills
+        intervention_concepts_labels = test_labels[:, 3:5]  # Next 2 columns for ICs
+        skill_labels = test_labels[:, 5:]   # Remaining columns for skills
         
         # Process factor predictions
         factor_predictions = factors_logits[test_indices]
         factor_pred_classes = factor_predictions.max(dim=1)[1]
         factor_true_classes = factor_labels.max(dim=1)[1]
+        
+        # Process IC predictions
+        intervention_concepts_predictions = intervention_concepts_logits[test_indices]
+        ic_pred_classes = intervention_concepts_predictions.max(dim=1)[1]
+        ic_true_classes = intervention_concepts_labels.max(dim=1)[1]
         
         # Process skill predictions
         skill_predictions = torch.sigmoid(skills_logits[test_indices])
@@ -39,17 +45,23 @@ def evaluate_model(model: EnhancedTherapeuticGNN, data) -> Dict[str, Any]:
         # Calculate metrics for factors
         factor_accuracy = factor_pred_classes.eq(factor_true_classes).float().mean().item()
         
+        # Calculate metrics for ICs
+        ic_accuracy = ic_pred_classes.eq(ic_true_classes).float().mean().item()
+        
         # Calculate metrics for skills
         skill_accuracy = (skill_pred_classes == skill_labels).float().mean().item()
         
         # Convert to numpy arrays for sklearn metrics
         y_true_factors = factor_true_classes.cpu().numpy()
         y_pred_factors = factor_pred_classes.cpu().numpy()
+        y_true_ic = ic_true_classes.cpu().numpy()
+        y_pred_ic = ic_pred_classes.cpu().numpy()
         y_true_skills = skill_labels.cpu().numpy()
         y_pred_skills = skill_pred_classes.cpu().numpy()
         
         # Create classification reports
         factor_names = ['Bond', 'Goal Alignment', 'Task Agreement']
+        intervention_concepts_names = ['EAR', 'CP']
         skill_names = [
             'Reflective Listening', 'Genuineness', 'Validation', 
             'Affirmation', 'Respect for Autonomy', 'Asking for Permission', 
@@ -62,6 +74,15 @@ def evaluate_model(model: EnhancedTherapeuticGNN, data) -> Dict[str, Any]:
                 y_true_factors,
                 y_pred_factors,
                 target_names=factor_names,
+                output_dict=True,
+                zero_division=0
+            )
+            
+            # IC classification report
+            ic_report = classification_report(
+                y_true_ic,
+                y_pred_ic,
+                target_names=intervention_concepts_names,
                 output_dict=True,
                 zero_division=0
             )
@@ -82,18 +103,23 @@ def evaluate_model(model: EnhancedTherapeuticGNN, data) -> Dict[str, Any]:
         # Generate confusion matrices
         try:
             factor_conf_matrix = confusion_matrix(y_true_factors, y_pred_factors)
+            ic_conf_matrix = confusion_matrix(y_true_ic, y_pred_ic)
             skill_conf_matrices = multilabel_confusion_matrix(y_true_skills, y_pred_skills)
         except ValueError as e:
             print(f"Warning: Could not generate confusion matrix: {e}")
             factor_conf_matrix = np.array([[0]])
+            ic_conf_matrix = np.array([[0]])
             skill_conf_matrices = np.array([[[0, 0], [0, 0]]] * len(skill_names))
         
         return {
             'factor_accuracy': factor_accuracy,
+            'ic_accuracy': ic_accuracy,
             'skill_accuracy': skill_accuracy,
             'factor_classification_report': factor_report,
+            'ic_classification_report': ic_report,
             'skill_classification_report': skill_report,
             'factor_confusion_matrix': factor_conf_matrix,
+            'ic_confusion_matrix': ic_conf_matrix,
             'skill_confusion_matrices': skill_conf_matrices,
             'num_test_examples': len(test_indices)
         }
@@ -115,7 +141,7 @@ def predict_new_text(
             text_features = text_features.unsqueeze(0)
         
         # Get predictions using the unified forward pass
-        factor_probs, skill_probs = model(
+        factor_probs, ic_probs, skill_probs = model(
             text_features,
             edge_index=None,  # Process independently
             return_logits=False  # Get probabilities directly
@@ -123,6 +149,7 @@ def predict_new_text(
         
         # Create probability dictionaries
         factor_names = ['Bond', 'Goal Alignment', 'Task Agreement']
+        intervention_concepts = ['EAR', 'CP']
         skill_names = [
             'Reflective Listening', 'Genuineness', 'Validation', 
             'Affirmation', 'Respect for Autonomy', 'Asking for Permission', 
@@ -131,27 +158,35 @@ def predict_new_text(
         
         # Ensure we're working with the first (and only) prediction
         factor_probs = factor_probs.squeeze(0)
+        ic_probs = ic_probs.squeeze(0)
         skill_probs = skill_probs.squeeze(0)
         
         factor_predictions = {
             name: prob.item() for name, prob in zip(factor_names, factor_probs)
         }
         
+        ic_predictions = {
+            name: prob.item() for name, prob in zip(intervention_concepts, ic_probs)
+        }
+        
         skill_predictions = {
             name: prob.item() for name, prob in zip(skill_names, skill_probs)
         }
         
-        return factor_predictions, skill_predictions
+        return factor_predictions, ic_predictions, skill_predictions
 
 def main():
     # Load data and model
-    data, dataset = load_data()
+    data, dataset = load_data('data/htc_examples_ids.csv')
     
     model = EnhancedTherapeuticGNN(
         in_channels=data.x.size(1),
         hidden_channels=64,
         num_common_factors=3,
-        num_skills=7
+        num_intervention_concepts=2,
+        num_skills=7,
+        num_layers=2,
+        dropout=0.5
     )
     
     try:
@@ -205,17 +240,24 @@ def main():
         # Example of predicting new text
         print("\nPredicting New Examples:")
         example_texts = [
-            "Therapist: 'You mentioned wanting to improve your communication with your partner. Can you tell me more about what that would look like for you?'",
-            "Therapist: 'What specific changes would you like to see in your relationship by the end of therapy?'",
-            "Therapist: 'Let's break down this new communication technique into smaller steps we can practice.'"
+            "You mentioned wanting to improve your communication with your partner. Can you tell me more about what that would look like for you?'",
+            "What specific changes would you like to see in your relationship by the end of therapy?",
+            "Let's break down this new communication technique into smaller steps we can practice.",
+            "And so let's just start right there and tell me what brought you here today?", # OQ + CP
+            "It used to… And the people that you're working with what you're doing, uh… you don't feel good about that. Sometimes is that the way…" # RL + EAR
         ]
         
         for text in example_texts:
-            factor_preds, skill_preds = predict_new_text(model, dataset, text)
+            factor_preds, ic_preds, skill_preds = predict_new_text(model, dataset, text)
             print(f"\nText: {text}")
             print("\nPredicted Common Factors:")
             for factor, prob in factor_preds.items():
                 print(f"{factor}: {prob:.4f}")
+                
+            print("\nPredicted Intervention Concepts:")
+            for ic, prob in ic_preds.items():
+                print(f"{ic}: {prob:.4f}")
+                      
             print("\nPredicted Skills:")
             for skill, prob in skill_preds.items():
                 print(f"{skill}: {prob:.4f}")

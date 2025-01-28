@@ -127,11 +127,11 @@ def get_node_data(csv_path: str) -> Tuple[
             example_id = row.get('id')
             
             # Safely parse the factor_id
-            factor_id_str = row.get("factor_id", "").strip()
+            factor_id_str = row.get("CF_id", "").strip()
             factor_id = int(factor_id_str) if factor_id_str else 0
 
             # Safely parse the ic_id
-            ic_id_str = row.get("ic_id", "").strip()
+            ic_id_str = row.get("IC_id", "").strip()
             ic_id = int(ic_id_str) if ic_id_str else 0
 
             # Safely parse the skill_id
@@ -143,8 +143,8 @@ def get_node_data(csv_path: str) -> Tuple[
                 "id": example_id,
                 "type": "example",
                 "text": row.get("text", ""),
-                "factor_id": factor_id,
-                "ic_id": ic_id,
+                "CF_id": factor_id,
+                "IC_id": ic_id,
                 "skill_id": skill_id
             }
             
@@ -179,16 +179,16 @@ def get_edge_indices(csv_path: str) -> List[Tuple[int, int]]:
             example_id = int(row['id'])
             
              # Safely parse the factor_id
-            factor_id_str = row.get("factor_id", "").strip()
-            cf_id = int(factor_id_str) if factor_id_str else 0
+            factor_id_str = row.get("CF_id", "").strip()
+            cf_id = int(factor_id_str) if factor_id_str else -1
 
             # Safely parse the ic_id
-            ic_id_str = row.get("ic_id", "").strip()
-            ic_id = int(ic_id_str) if ic_id_str else 0
+            ic_id_str = row.get("IC_id", "").strip()
+            ic_id = int(ic_id_str) if ic_id_str else -1
 
             # Safely parse the skill_id
             skill_id_str = row.get("skill_id", "").strip()
-            skill_id = int(skill_id_str) if skill_id_str else 0
+            skill_id = int(skill_id_str) if skill_id_str else -1
 
             # Add to sets
             cf_ids.add(cf_id)
@@ -202,6 +202,8 @@ def get_edge_indices(csv_path: str) -> List[Tuple[int, int]]:
                 'ic_id': ic_id,
                 'skill_id': skill_id
             })
+            
+    print(f"examples before edge building: {examples}")
 
     # 2. Build edges
     edges: List[Tuple[int, int]] = []
@@ -210,17 +212,48 @@ def get_edge_indices(csv_path: str) -> List[Tuple[int, int]]:
     for cf_id in cf_ids:
         edges.append((0, cf_id))
 
-    # (b) Skills -> CF, mirroring your original "all skill->CF pairs"
-    for skill_id in skill_ids:
-        for cf_id in cf_ids:
-            edges.append((skill_id, cf_id))
+    # (b) Skills -> CFs
+    # for skill_id in skill_ids:
+    #     for cf_id in cf_ids:
+    #         edges.append((skill_id, cf_id))
 
     # (c) Example -> skill, CF, IC
     for ex in examples:
-        edges.append((ex['example_id'], ex['skill_id']))
-        edges.append((ex['example_id'], ex['cf_id']))
-        edges.append((ex['example_id'], ex['ic_id']))
+        ex_id = ex['example_id']
+        cf_id = ex['cf_id']
+        ic_id = ex['ic_id']
+        skill_id = ex['skill_id']
+        
+        # 1) If there's a skill, connect Example -> Skill
+        if skill_id != -1:
+            edges.append((ex_id, skill_id))
 
-    # 3. Make edges bidirectional (if desired)
+        # 2) If there's an IC:
+        if ic_id != -1:
+            edges.append((ex_id, ic_id))  # Example -> IC
+            edges.append((ic_id, cf_id))  # IC -> CF
+
+            # If there's also a skill, connect Skill -> IC
+            if skill_id != -1:
+                edges.append((skill_id, ic_id))
+        else:
+            # 3) If no IC, connect Example -> CF
+            edges.append((ex_id, cf_id))
+
+            # If there's a skill, connect Skill -> CF
+            if skill_id != -1:
+                edges.append((skill_id, cf_id))
+
+    # 3. Make edges bidirectional (TODO)
+    # print(f"Original edges: {edges}")
     bidirectional_edges = edges + [(dest, src) for (src, dest) in edges]
+    
+    # 4. Remove duplicates (set() of tuples) and convert back to list
+    unique_edges = list(set(bidirectional_edges))
+
+    # Optional: sort them if you need a deterministic order
+    unique_edges.sort()
+
+    print(f"Final unique edges: {unique_edges}")
+    
     return bidirectional_edges

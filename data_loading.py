@@ -1,5 +1,7 @@
 # data_loading.py
 
+import sys
+
 import torch
 from torch_geometric.data import Data
 from transformers import AutoTokenizer, AutoModel
@@ -47,53 +49,65 @@ class TherapeuticDataset:
         
         # 1. Process root, factors, ICs, skills
         for node in self.root + self.factors + self.intervention_concepts + self.skills:
-            text = f"{node['name']} {node['description']}"
+            # print(f"### {node['name']}: {node['description']}")
+            text = f"{node['name']}: {node['description']}"
             node_features.append(self._encode_text(text))
         
         # 2. Process examples (which primarily have a 'text' field)
         for example in self.examples:
             node_features.append(self._encode_text(example['text']))
-        print(node_features)
+            
         return torch.stack(node_features)
     
     def _create_labels(self) -> torch.Tensor:
         """
-        Create a combined labels tensor for factors + intervention_concepts + skills.
-        Each example can have multiple active labels (one-hot or multi-hot).
+        Create a combined labels tensor for:
+        - 3 Common Factors (IDs 1..3)
+        - 2 Intervention Concepts (IDs 4..5)
+        - 7 Skills (IDs 6..12)
+        Total columns = 3 + 2 + 7 = 12
+
+        If an example row has factor_id=1, that sets column 0 to 1.
+        If factor_id=2 => col 1 = 1, factor_id=3 => col 2 = 1
+        If ic_id=4 => col 3=1, ic_id=5 => col 4=1
+        If skill_id=6 => col 5=1, 7 => col 6=1, ... 12 => col 11=1
         """
         num_examples = len(self.examples)
-        num_factors = len(self.factors)
-        num_intervention_concepts = len(self.intervention_concepts)
-        num_skills = len(self.skills)
-        
-        # Shape: [num_examples, num_factors + num_intervention_concepts + num_skills]
-        labels = torch.zeros((num_examples, num_factors + num_intervention_concepts + num_skills))
-        print(f"labels shape: {labels.shape}")
-        
+
+        # We hardcode that there are 3 CF, 2 IC, 7 skills => total 12 columns
+        num_factors = 3
+        num_intervention_concepts = 2
+        num_skills = 7
+        total_cols = num_factors + num_intervention_concepts + num_skills  # 12
+
+        labels = torch.zeros((num_examples, total_cols), dtype=torch.float)
+        # print(f"Examples\n{self.examples}")
         for i, example in enumerate(self.examples):
-            # Convert string IDs to int if necessary (depending on how example data is loaded)
-            factor_id = int(example['factor_id'])
-            ic_id = int(example['ic_id'])
-            skill_id = int(example['skill_id'])
-            
-            # Factors are indexed from 1..N, so shift to 0-based
-            factor_idx = factor_id - 1
-            labels[i, factor_idx] = 1
-            
-            # Intervention Concepts: offset by num_factors
-            ic_idx = (ic_id - 1) + num_factors
-            labels[i, ic_idx] = 1
-            
-            # Skills: offset by num_factors + num_intervention_concepts
-            # If your skill IDs also start at 1, then offset it the same way
-            # (But in your original code, skill_id started at 4, so adjust accordingly)
-            # For example, if your skill IDs are 4..10, shift them down by 4 to be zero-based.
-            skill_offset = num_factors + num_intervention_concepts
-            # skill_id (4..10) -> (0..6) after subtracting 4
-            print(f"skill_id: {skill_id}, skill_offset: {skill_offset}")
-            skill_idx = (skill_id - 6) + skill_offset
-            labels[i, skill_idx] = 1
-        print(f"New labels shape: {labels.shape}")
+            # Factor ID in [1..3]
+            factor_id = int(example.get('CF_id', 0))
+            if 1 <= factor_id <= 3:
+                factor_idx = factor_id - 1        # CF 1->col0, 2->col1, 3->col2
+                labels[i, factor_idx] = 1.0
+
+            # IC ID in [4..5]
+            ic_id = int(example.get('IC_id', 0))
+            if 4 <= ic_id <= 5:
+                # e.g. ID=4 => index=0 => column=3; ID=5 => index=1 => column=4
+                ic_idx = (ic_id - 4) + num_factors
+                labels[i, ic_idx] = 1.0
+
+            # Skill ID in [6..12]
+            skill_id = int(example.get('skill_id', 0))
+            if 6 <= skill_id <= 12:
+                # e.g. ID=6 => index=0 => column=5; ID=12 => index=6 => column=11
+                skill_offset = num_factors + num_intervention_concepts  # 3 + 2 = 5
+                skill_idx = (skill_id - 6) + skill_offset
+                labels[i, skill_idx] = 1.0
+                   
+            # print(f"Example {i}: factor={factor_id}, ic={ic_id}, skill={skill_id}")
+
+        # print("Final label tensor shape:", labels.shape)
+        # print(labels)
         return labels
     
     def encode_new_text(self, text: str) -> torch.Tensor:
@@ -171,3 +185,40 @@ def load_data(filepath: str) -> Tuple[Data, TherapeuticDataset]:
     dataset = TherapeuticDataset(filepath=filepath)
     data = dataset.create_pyg_data()
     return data, dataset
+
+
+def main():
+    # 1) Get filepath from command-line or hardcode
+    if len(sys.argv) > 1:
+        filepath = sys.argv[1]
+    else:
+        # Provide a default CSV if none is passed
+        filepath = "data/htc_examples_ids.csv"
+    
+    print(f"Using CSV: {filepath}")
+    
+    # 2) Instantiate the dataset
+    dataset = TherapeuticDataset(filepath)
+    
+    # 3) Call _create_labels() to test label creation
+    print("Testing _create_labels()...")
+    labels = dataset._create_labels()
+    print("Labels Tensor Shape:", labels.shape)
+    print("Labels Tensor:")
+    print(labels)
+    
+    # 4) Optionally, create the full PyG Data object to verify the entire pipeline
+    print("\nTesting create_pyg_data()...")
+    pyg_data = dataset.create_pyg_data()
+    print("PyG Data object created.")
+    print("x shape:", pyg_data.x.shape)
+    print("y shape:", pyg_data.y.shape)
+    print("edge_index shape:", pyg_data.edge_index.shape)
+    print("train_mask sum:", pyg_data.train_mask.sum())
+    print("val_mask sum:", pyg_data.val_mask.sum())
+    print("test_mask sum:", pyg_data.test_mask.sum())
+    
+    print("\nDone.")
+
+if __name__ == "__main__":
+    main()

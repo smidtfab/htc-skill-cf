@@ -9,16 +9,17 @@ from typing import Tuple
 
 def compute_losses(
     factors_logits: torch.Tensor,
+    intervention_concept_logits: torch.Tensor,
     skills_logits: torch.Tensor,
     labels: torch.Tensor,  # Combined labels
     example_indices: torch.Tensor
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     """Compute losses for both tasks"""
-    print(f"Labels shape: {labels.shape}")
-    print(f"Factors logits shape: {factors_logits.shape}")
-    print(f"Skills logits shape: {skills_logits.shape}")
-    print(f"Example indices shape: {example_indices.shape}")
-    print(f"labels:\n{labels}")
+    # print(f"Labels shape: {labels.shape}")
+    # print(f"Factors logits shape: {factors_logits.shape}")
+    # print(f"Skills logits shape: {skills_logits.shape}")
+    # print(f"Example indices shape: {example_indices.shape}")
+    # print(f"labels:\n{labels}")
     # Assuming labels are combined: first 3 columns for factors (one-hot), next two are the intervention concepts, and next 7 for skills (multi-label)
     factors_labels = labels[:, :3]  # First 3 columns for factors
     ic_labels = labels[:, 3:5]     # Next 8 columns for ICs
@@ -28,28 +29,33 @@ def compute_losses(
     # print("Skills labels:", skills_labels)
     
     # print("Factors logits:", factors_logits)
-    print("factor preds:", factors_logits[example_indices])
-    print("factor labels in loss", factors_labels[example_indices].argmax(dim=1))
+    # print("factor preds:", factors_logits[example_indices])
+    # print("factor labels in loss", factors_labels[example_indices].argmax(dim=1))
     
     factors_loss = F.cross_entropy(
         factors_logits[example_indices],
         factors_labels[example_indices].argmax(dim=1)  # Convert one-hot to class index
     )
     
+    intervention_concept_loss = F.cross_entropy(
+        intervention_concept_logits[example_indices],
+        ic_labels[example_indices].argmax(dim=1)  # Convert one-hot to class index
+    )
+    
     # print("Skills logits:", skills_logits)
     # print("skills_labels:", skills_labels[example_indices])
     # print("skills labels before loss", skills_labels[example_indices].argmax(dim=1))
     # print("skills labels in loss", skills_labels[example_indices - 11].argmax(dim=1))
-    print(f"Skill preds\n{skills_labels[example_indices]}")
-    print(f"Skill labels\n{skills_labels[example_indices].argmax(dim=1)}")
-    print(f"Skills logits shape: {skills_logits[example_indices].shape}")
-    print(f"Skills labels shape: {skills_labels[example_indices].argmax(dim=1).shape}")
+    # print(f"Skill preds\n{skills_labels[example_indices]}")
+    # print(f"Skill labels\n{skills_labels[example_indices].argmax(dim=1)}")
+    # print(f"Skills logits shape: {skills_logits[example_indices].shape}")
+    # print(f"Skills labels shape: {skills_labels[example_indices].argmax(dim=1).shape}")
     skills_loss = F.cross_entropy(
         skills_logits[example_indices],
         skills_labels[example_indices].argmax(dim=1)  # Convert one-hot to class index
     )
     
-    return factors_loss, skills_loss
+    return factors_loss, intervention_concept_loss, skills_loss
 
 def train_model(
     model: EnhancedTherapeuticGNN,
@@ -76,12 +82,12 @@ def train_model(
         # Training
         model.train()
         optimizer.zero_grad()
-        factors_logits, skills_logits = model(data.x, data.edge_index)
+        factors_logits, intervention_concept_logits, skills_logits = model(data.x, data.edge_index)
         
         # Only compute loss if we have training examples
         if len(train_example_indices) > 0:
-            factors_loss, skills_loss = compute_losses(
-                factors_logits, skills_logits,
+            factors_loss, intervention_concept_loss, skills_loss = compute_losses(
+                factors_logits, intervention_concept_logits, skills_logits,
                 data.y,  # Using combined labels
                 train_example_indices
             )
@@ -89,6 +95,7 @@ def train_model(
             # Weighted sum of losses
             total_loss = (
                 task_weights[0] * factors_loss +
+                task_weights[1] * intervention_concept_loss +
                 task_weights[1] * skills_loss
             )
             
@@ -103,14 +110,15 @@ def train_model(
         model.eval()
         with torch.no_grad():
             if len(val_example_indices) > 0:
-                val_factors_logits, val_skills_logits = model(data.x, data.edge_index)
-                val_factors_loss, val_skills_loss = compute_losses(
-                    val_factors_logits, val_skills_logits,
+                val_factors_logits, val_intervention_concepts_logits, val_skills_logits = model(data.x, data.edge_index)
+                val_factors_loss, val_intervention_concepts_loss, val_skills_loss = compute_losses(
+                    val_factors_logits, val_intervention_concepts_logits, val_skills_logits,
                     data.y,  # Using combined labels (first three cols are the CFs and the rest are the skills)
                     val_example_indices
                 )
                 val_total_loss = (
                     task_weights[0] * val_factors_loss +
+                    task_weights[1] * val_intervention_concepts_loss +
                     task_weights[1] * val_skills_loss
                 )
                 val_losses.append(val_total_loss.item())
@@ -165,7 +173,7 @@ def main():
         train_losses, val_losses = train_model(
             model, data, optimizer,
             task_weights=(1.0, 1.0),  # Equal weights for both tasks,
-            epochs=200
+            epochs=300
         )
         
         # Save model

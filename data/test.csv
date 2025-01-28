@@ -1,0 +1,6 @@
+id,text,CF,CF_id,IC,IC_id,skill,skill_id
+13,"I hear you, and it must feel awful to be criticized in that way.",B,1,EAR,4,V,8
+14,It sounds like you’re feeling really overwhelmed right now. That’s completely understandable given what you’re going through.,B,1,EAR,4,V,8
+15,I can hear the pain in your voice when you talk about that experience. It must have been incredibly hard for you.,B,1,EAR,4,V,8
+16,"And yet, as you say, you do have these desires and you do have your feelings, but- but you don't feel good about them?",B,1,EAR,4,RL,6
+17,I have a homework assignment that might help you practice the skills we’re working on. Would you be willing to try it this week?,TA,3,,,AP,11

@@ -29,6 +29,7 @@ class EnhancedTherapeuticGNN(torch.nn.Module):
         
         # Task-specific layers
         self.factors_classifier = Linear(hidden_channels, num_common_factors)
+        self.intervention_concepts_classifier = Linear(hidden_channels, num_intervention_concepts)
         self.skills_classifier = Linear(hidden_channels, num_skills)
     
     def forward(
@@ -62,11 +63,13 @@ class EnhancedTherapeuticGNN(torch.nn.Module):
         
         # Get predictions
         factors_output = self.factors_classifier(x)
+        intervention_concepts_output = self.intervention_concepts_classifier(x)
         skills_output = self.skills_classifier(x)
         
         # Return logits or probabilities based on flag
         if not return_logits:
             factors_output = F.softmax(factors_output, dim=-1)
+            intervention_concepts_output = F.softmax(intervention_concepts_output, dim=-1)
             skills_output = F.softmax(skills_output, dim=-1)
             
-        return factors_output, skills_output
+        return factors_output, intervention_concepts_output, skills_output

@@ -42,7 +42,7 @@ def convert_abbreviations_to_ids(input_csv: str, output_csv: str) -> None:
         writer.writeheader()
         
         for row in reader:
-            example_id = reader.line_num - 1
+            example_id = reader.line_num - 1 + 12 # start from 12 ie after the last skill id
             text = row.get("text", "")
             cf_abbrev = row.get("CF", "")
             ic_abbrev = row.get("IC", "")

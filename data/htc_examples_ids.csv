@@ -1,70 +1,72 @@
 id,text,CF,CF_id,IC,IC_id,skill,skill_id
-1,"I hear you, and it must feel awful to be criticized in that way.",B,1,EAR,4,V,8
-2,It sounds like you’re feeling really overwhelmed right now. That’s completely understandable given what you’re going through.,B,1,EAR,4,V,8
-3,I can hear the pain in your voice when you talk about that experience. It must have been incredibly hard for you.,B,1,EAR,4,V,8
-4,"And yet, as you say, you do have these desires and you do have your feelings, but- but you don't feel good about them?",B,1,EAR,4,RL,6
-5,"Yeah, I get the disappointment - that here, a lot of these things you’d thought you'd worked through, and now the guilts and the feeling that only a part of you is acceptable to anybody else.",B,1,EAR,4,RL,6
-6,I guess I do catch the real deep puzzlement that you feel as to What the hell shall I do? What can I do?,B,1,EAR,4,RL,6
-7,Hearing about your experience made me feel a deep sense of empathy for what you’ve gone through. It’s incredibly impactful.,B,1,EAR,4,G,7
-8,"You have a great deal of patience and courage, I admire that.",B,1,EAR,4,A,9
-9,"As you talk about all of the troubles you've been through, do you know what strikes me? You are a real survivor. You've taken a lot of hard knocks, and you're still here.",B,1,EAR,4,A,9
-10,Thank you for being willing to discuss our relationship. It is very helpful.,B,1,EAR,4,A,9
-11,"You intended not to drink at all this week, and you had five days with no alcohol at all. That's amazing! How did you do that?",B,1,EAR,4,A,9
-12,You deeply love your children and want to do all you can to protect them.,B,1,EAR,4,A,9
-13,I appreciate you being so open and forthright about what is going through your mind here.,B,1,EAR,4,A,9
-14,I support your decision to set boundaries in that relationship. It sounds like it’s what you need for your well-being.,B,1,EAR,4,RA,10
-15,"This is just my opinion of course, and you might disagree, but from my perspective, it seems that you have a number of qualities that make you a good candidate for this treatment.",B,1,EAR,4,RA,10
-16,"I'll tell you what I heard there and you tell me if I got it or not, but it's kind of like, you've been so busy from the time you were a girl, being a role model, and having these abilities, that you had no resting place.",B,1,EAR,4,RA,10
-17,You’ve got the strength and ability to handle this. What strategies have worked for you in the past?,B,1,EAR,4,RA,10
-18,"You’re safe here to express whatever you’re feeling. There’s no judgment, only support.",B,1,EAR,4,,
-19,"I hear you, and I want to understand what you're experiencing.",B,1,EAR,4,,
-20,You know yourself better than anyone else. What do you think would be the most helpful next step?,B,1,CP,5,RA,10
-21,We’ll move at a pace that feels comfortable for you. Let me know if you ever need to slow down or take a break.,B,1,CP,5,RA,10
-22,How do you feel about the options we’ve discussed? Which one resonates most with you?,B,1,CP,5,RA,10
-23,You have a lot of insight into your own life. What do you believe is the root of this issue?,B,1,CP,5,RA,10
-24,I believe you have the skills to manage this situation. How would you like to approach it?,B,1,CP,5,RA,10
-25,"It’s your decision, and I’m here to support you in whatever you choose. What possibilities are you considering?",B,1,CP,5,RA,10
-26,"You are certainly the expert in knowing yourself, and we will need to draw on that expertise as we progress.",B,1,CP,5,RA,10
-27,"I realize I might not fully understand your experience right now, and I appreciate your patience as we work through this together.",B,1,CP,5,G,7
-28,"Although no course of treatment is foolproof, I do believe that we can work together to help you deal with your problems.",B,1,CP,5,,
-29,"You are certainly the expert in knowing yourself, and we will need to draw on that expertise as we progress. And, as an expert in this treatment approach, I can help to guide you through the process of therapy. The important thing is that we collaborate throughout the experience. Does this make sense?",B,1,CP,5,,
-30,"You have a say in your treatment, and we'll collaborate on the best path forward.",B,1,CP,5,,
-31,Our work together is a collaboration. Your insights and feedback are essential in tailoring our sessions to your needs.,B,1,CP,5,,
-32,Your therapy is about you. We'll customize our approach to align with your specific needs and aspirations.,B,1,CP,5,,
-33,I hope you feel comfortable sharing your true thoughts and feelings here. Your honesty is a vital part of our work together.,B,1,CP,5,,
-34,"I know you’re feeling frustrated right now, and I’m here to support you. Let’s work together to find a way through this.",B,1,CP,5,,
-35,Let’s focus on what you want to achieve in therapy. What are your goals for our work together?,GA,2,,,RA,10
-36,It’s important that the direction we take aligns with what you want to accomplish. What are your priorities right now?,GA,2,,,RA,10
-37,Let's work together to define some realistic objectives for you.,GA,2,,,RA,10
-38,"If at any point you feel the need to adjust our goals or priorities, please don't hesitate to let me know.",GA,2,,,RA,10
-39,Can you tell me more about what brings you to therapy and what changes you’re hoping to see in your life?,GA,2,,,OQ,12
-40,What would you like to achieve through our sessions together? What are the most important changes you want to make?,GA,2,,,OQ,12
-41,I want to make sure that the goals we set are ones that feel right for you. How do these goals align with what you’re hoping to achieve?,GA,2,,,OQ,12
-42,"Let’s work together to identify some concrete steps you can take towards your goals. What are some small, manageable actions that you feel ready to start with?",GA,2,,,OQ,12
-43,"By setting these goals, we’re creating a roadmap for your progress. How do you feel about these goals?",GA,2,,,OQ,12
-44,It sounds like you’ve been feeling very discouraged and overwhelmed. Can you help me understand more about what’s contributing to these feelings?,GA,2,,,RL+OQ,
-45,"Based on what we’ve discussed, it seems like reducing your anxiety and improving your self-confidence are key goals for you. How do you feel about focusing on these areas?",GA,2,,,SS+OQ,
-46,You mentioned wanting to improve your relationships and feel more motivated at work. Let’s talk about specific goals we can set to work towards these outcomes.,GA,2,,,SS,
-47,That has been really useful to help me understand a little about what has led you to seek treatment; next it might be helpful for us to think together about what your hopes for the future might be.,GA,2,,,,
-48,"Ok, now that we have agreed upon the goals you want to work on, it would be helpful to get an idea of where you are right now with each of the goals. This will help us get an idea of where we are starting from, and what you have already managed to achieve, and it can help us keep track of how far you have moved on, at a later date.",GA,2,,,,
-49,I can appreciate your desire to stay with your past. Can we think about that in terms of our treatment plan and goals? I am open to revising our focus if it makes sense to us in terms of what we are trying to accomplish—and it very well may.,GA,2,,,V,8
-50,You know yourself better than anyone else. What do you think would be the most helpful next step?,TA,3,,,RA,10
-51,We’ll move at a pace that feels comfortable for you. Let me know if you ever need to slow down or take a break.,TA,3,,,RA,10
-52,How do you feel about the options we’ve discussed? Which one resonates most with you?,TA,3,,,RA,10
-53,What do you think would be the best approach for you to take in this situation?,TA,3,,,RA,10
-54,I’ve been thinking about incorporating some elements of art therapy into our sessions. Would you be interested in that?,TA,3,,,RA,10
-55,"In our sessions, my role is to guide and support you in exploring your thoughts and feelings, while your role is to actively engage in this process and share openly. Does that sound good to you?",TA,3,,,RA,10
-56,"We’ll meet here weekly for 50-minute sessions. If you ever need to reschedule or have any concerns about the setting, please let me know. Does that work for you?",TA,3,,,RA,10
-57,"You are certainly the expert in knowing yourself, and we will need to draw on that expertise as we progress. And, as an expert in this treatment approach, I can help to guide you through the process of therapy. The important thing is that we collaborate throughout the experience. Does this make sense?",TA,3,CP,5,,
-58,Our work together is a collaboration. Your insights and feedback are essential in tailoring our sessions to your needs.,TA,3,CP,5,,
-59,"Today, I thought we could focus on the anxiety you’ve been experiencing at work. Does that align with what you want to work on today?",TA,3,CP,5,,
-60,We’ve been working on developing coping strategies for your stress. Do you feel that these strategies are aligning with your overall goal of feeling more in control?,TA,3,CP,5,,
-61,"After you've told me about your challenges, I have some ideas about how we could best address them. I'll explain them to you and would like to understand if they align with what you had in mind when you decided to start therapy. If you have any questions or input, please let me know.",TA,3,CP,5,,
-62,"Let’s work together to identify some concrete steps you can take towards your goals. What are some small, manageable actions that you feel ready to start with?",TA,3,,,OQ,12
-63,How are you feeling about the progress we’re making towards your goals? Are there any adjustments you think we need to make?,TA,3,,,OQ,12
-64,"Our sessions will take place here in this office, which is a confidential and safe space for you to talk about anything you need to. Is there anything you need to feel more comfortable in this setting?",TA,3,,,OQ,12
-65,We will try to understand what stresses and relationships in your life may be contributing to depression.,TA,3,,,,
-66,I want to make sure you understand that therapy is a collaborative process. We’ll work together to identify the issues you want to focus on and develop strategies to address them. Is that clear?,TA,3,,,,
-67,"I'd like to meet with you once a week for twelve to sixteen more times for about an hour each time, to try to understand with you the stresses in your life and how they relate to your depression.",TA,3,,,,
-68,I’d like to try a mindfulness exercise that might help you manage your anxiety. Would you be open to giving it a try?,TA,3,,,AP,11
-69,I have a homework assignment that might help you practice the skills we’re working on. Would you be willing to try it this week?,TA,3,,,AP,11
+13,"I hear you, and it must feel awful to be criticized in that way.",B,1,EAR,4,V,8
+14,It sounds like you’re feeling really overwhelmed right now. That’s completely understandable given what you’re going through.,B,1,EAR,4,V,8
+15,I can hear the pain in your voice when you talk about that experience. It must have been incredibly hard for you.,B,1,EAR,4,V,8
+16,"And yet, as you say, you do have these desires and you do have your feelings, but- but you don't feel good about them?",B,1,EAR,4,RL,6
+17,"Yeah, I get the disappointment - that here, a lot of these things you’d thought you'd worked through, and now the guilts and the feeling that only a part of you is acceptable to anybody else.",B,1,EAR,4,RL,6
+18,I guess I do catch the real deep puzzlement that you feel as to What the hell shall I do? What can I do?,B,1,EAR,4,RL,6
+19,Hearing about your experience made me feel a deep sense of empathy for what you’ve gone through. It’s incredibly impactful.,B,1,EAR,4,G,7
+20,"You have a great deal of patience and courage, I admire that.",B,1,EAR,4,A,9
+21,"As you talk about all of the troubles you've been through, do you know what strikes me? You are a real survivor. You've taken a lot of hard knocks, and you're still here.",B,1,EAR,4,A,9
+22,Thank you for being willing to discuss our relationship. It is very helpful.,B,1,EAR,4,A,9
+23,"You intended not to drink at all this week, and you had five days with no alcohol at all. That's amazing! How did you do that?",B,1,EAR,4,A,9
+24,You deeply love your children and want to do all you can to protect them.,B,1,EAR,4,A,9
+25,I appreciate you being so open and forthright about what is going through your mind here.,B,1,EAR,4,A,9
+26,I support your decision to set boundaries in that relationship. It sounds like it’s what you need for your well-being.,B,1,EAR,4,RA,10
+27,"This is just my opinion of course, and you might disagree, but from my perspective, it seems that you have a number of qualities that make you a good candidate for this treatment.",B,1,EAR,4,RA,10
+28,"I'll tell you what I heard there and you tell me if I got it or not, but it's kind of like, you've been so busy from the time you were a girl, being a role model, and having these abilities, that you had no resting place.",B,1,EAR,4,RA,10
+29,You’ve got the strength and ability to handle this. What strategies have worked for you in the past?,B,1,EAR,4,RA,10
+30,"You’re safe here to express whatever you’re feeling. There’s no judgment, only support.",B,1,EAR,4,,
+31,"I hear you, and I want to understand what you're experiencing.",B,1,EAR,4,,
+32,You know yourself better than anyone else. What do you think would be the most helpful next step?,B,1,CP,5,RA,10
+33,We’ll move at a pace that feels comfortable for you. Let me know if you ever need to slow down or take a break.,B,1,CP,5,RA,10
+34,How do you feel about the options we’ve discussed? Which one resonates most with you?,B,1,CP,5,RA,10
+35,You have a lot of insight into your own life. What do you believe is the root of this issue?,B,1,CP,5,RA,10
+36,I believe you have the skills to manage this situation. How would you like to approach it?,B,1,CP,5,RA,10
+37,"It’s your decision, and I’m here to support you in whatever you choose. What possibilities are you considering?",B,1,CP,5,RA,10
+38,"You are certainly the expert in knowing yourself, and we will need to draw on that expertise as we progress.",B,1,CP,5,RA,10
+39,"I realize I might not fully understand your experience right now, and I appreciate your patience as we work through this together.",B,1,CP,5,G,7
+40,"Although no course of treatment is foolproof, I do believe that we can work together to help you deal with your problems.",B,1,CP,5,,
+41,"You are certainly the expert in knowing yourself, and we will need to draw on that expertise as we progress. And, as an expert in this treatment approach, I can help to guide you through the process of therapy. The important thing is that we collaborate throughout the experience. Does this make sense?",B,1,CP,5,,
+42,"You have a say in your treatment, and we'll collaborate on the best path forward.",B,1,CP,5,,
+43,Our work together is a collaboration. Your insights and feedback are essential in tailoring our sessions to your needs.,B,1,CP,5,,
+44,Your therapy is about you. We'll customize our approach to align with your specific needs and aspirations.,B,1,CP,5,,
+45,I hope you feel comfortable sharing your true thoughts and feelings here. Your honesty is a vital part of our work together.,B,1,CP,5,,
+46,"I know you’re feeling frustrated right now, and I’m here to support you. Let’s work together to find a way through this.",B,1,CP,5,,
+47,Let’s focus on what you want to achieve in therapy. What are your goals for our work together?,GA,2,,,RA,10
+48,It’s important that the direction we take aligns with what you want to accomplish. What are your priorities right now?,GA,2,,,RA,10
+49,Let's work together to define some realistic objectives for you.,GA,2,,,RA,10
+50,"If at any point you feel the need to adjust our goals or priorities, please don't hesitate to let me know.",GA,2,,,RA,10
+51,Can you tell me more about what brings you to therapy and what changes you’re hoping to see in your life?,GA,2,,,OQ,12
+52,What would you like to achieve through our sessions together? What are the most important changes you want to make?,GA,2,,,OQ,12
+53,I want to make sure that the goals we set are ones that feel right for you. How do these goals align with what you’re hoping to achieve?,GA,2,,,OQ,12
+54,"Let’s work together to identify some concrete steps you can take towards your goals. What are some small, manageable actions that you feel ready to start with?",GA,2,,,OQ,12
+55,"By setting these goals, we’re creating a roadmap for your progress. How do you feel about these goals?",GA,2,,,OQ,12
+56,It sounds like you’ve been feeling very discouraged and overwhelmed. Can you help me understand more about what’s contributing to these feelings?,GA,2,,,RL,6
+57,It sounds like you’ve been feeling very discouraged and overwhelmed. Can you help me understand more about what’s contributing to these feelings?,GA,2,,,OQ,12
+58,"Based on what we’ve discussed, it seems like reducing your anxiety and improving your self-confidence are key goals for you. How do you feel about focusing on these areas?",GA,2,,,SS,
+59,"Based on what we’ve discussed, it seems like reducing your anxiety and improving your self-confidence are key goals for you. How do you feel about focusing on these areas?",GA,2,,,OQ,12
+60,You mentioned wanting to improve your relationships and feel more motivated at work. Let’s talk about specific goals we can set to work towards these outcomes.,GA,2,,,SS,
+61,That has been really useful to help me understand a little about what has led you to seek treatment; next it might be helpful for us to think together about what your hopes for the future might be.,GA,2,,,,
+62,"Ok, now that we have agreed upon the goals you want to work on, it would be helpful to get an idea of where you are right now with each of the goals. This will help us get an idea of where we are starting from, and what you have already managed to achieve, and it can help us keep track of how far you have moved on, at a later date.",GA,2,,,,
+63,I can appreciate your desire to stay with your past. Can we think about that in terms of our treatment plan and goals? I am open to revising our focus if it makes sense to us in terms of what we are trying to accomplish—and it very well may.,GA,2,,,V,8
+64,You know yourself better than anyone else. What do you think would be the most helpful next step?,TA,3,,,RA,10
+65,We’ll move at a pace that feels comfortable for you. Let me know if you ever need to slow down or take a break.,TA,3,,,RA,10
+66,How do you feel about the options we’ve discussed? Which one resonates most with you?,TA,3,,,RA,10
+67,What do you think would be the best approach for you to take in this situation?,TA,3,,,RA,10
+68,I’ve been thinking about incorporating some elements of art therapy into our sessions. Would you be interested in that?,TA,3,,,RA,10
+69,"In our sessions, my role is to guide and support you in exploring your thoughts and feelings, while your role is to actively engage in this process and share openly. Does that sound good to you?",TA,3,,,RA,10
+70,"We’ll meet here weekly for 50-minute sessions. If you ever need to reschedule or have any concerns about the setting, please let me know. Does that work for you?",TA,3,,,RA,10
+71,"You are certainly the expert in knowing yourself, and we will need to draw on that expertise as we progress. And, as an expert in this treatment approach, I can help to guide you through the process of therapy. The important thing is that we collaborate throughout the experience. Does this make sense?",TA,3,CP,5,,
+72,Our work together is a collaboration. Your insights and feedback are essential in tailoring our sessions to your needs.,TA,3,CP,5,,
+73,"Today, I thought we could focus on the anxiety you’ve been experiencing at work. Does that align with what you want to work on today?",TA,3,CP,5,,
+74,We’ve been working on developing coping strategies for your stress. Do you feel that these strategies are aligning with your overall goal of feeling more in control?,TA,3,CP,5,,
+75,"After you've told me about your challenges, I have some ideas about how we could best address them. I'll explain them to you and would like to understand if they align with what you had in mind when you decided to start therapy. If you have any questions or input, please let me know.",TA,3,CP,5,,
+76,"Let’s work together to identify some concrete steps you can take towards your goals. What are some small, manageable actions that you feel ready to start with?",TA,3,,,OQ,12
+77,How are you feeling about the progress we’re making towards your goals? Are there any adjustments you think we need to make?,TA,3,,,OQ,12
+78,"Our sessions will take place here in this office, which is a confidential and safe space for you to talk about anything you need to. Is there anything you need to feel more comfortable in this setting?",TA,3,,,OQ,12
+79,We will try to understand what stresses and relationships in your life may be contributing to depression.,TA,3,,,,
+80,I want to make sure you understand that therapy is a collaborative process. We’ll work together to identify the issues you want to focus on and develop strategies to address them. Is that clear?,TA,3,,,,
+81,"I'd like to meet with you once a week for twelve to sixteen more times for about an hour each time, to try to understand with you the stresses in your life and how they relate to your depression.",TA,3,,,,
+82,I’d like to try a mindfulness exercise that might help you manage your anxiety. Would you be open to giving it a try?,TA,3,,,AP,11
+83,I have a homework assignment that might help you practice the skills we’re working on. Would you be willing to try it this week?,TA,3,,,AP,11
